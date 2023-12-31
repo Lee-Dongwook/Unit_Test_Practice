@@ -1,10 +1,11 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const ForkCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const path = require('path')
 
 module.exports = {
   mode: 'development', 
-  entry: './src/index.jsx', 
+  entry: './src/index.tsx', 
  
   output: {
     filename: 'bundle.js',
@@ -21,10 +22,14 @@ module.exports = {
         { from: '/src/assets', to: 'assets/', noErrorOnMissing: true },
       ],
     }),
+    new ForkCheckerWebpackPlugin(),
   ],
   resolve: {
     modules: [path.resolve(__dirname, 'src'), 'node_modules'],
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx','.ts','.tsx'],
+    alias: {
+      '@': path.resolve(__dirname, 'src/'),
+    },
   },
   
   devServer: {
@@ -41,9 +46,14 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
-        use: ['babel-loader'],
+        use: ['babel-loader',{
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: true,
+          },
+        }],
       },
       {
         test: /\.css$/,
